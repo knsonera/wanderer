@@ -25,7 +25,7 @@ class AppUser(Base):
         }
 
 class Category(Base):
-    __tablename__ = 'topic'
+    __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -66,7 +66,7 @@ class Place(Base):
             'id': self.id,
         }
 
-engine = create_engine('postgresql://wanderer:11aa22ss@localhost:5432/wanderer',
+engine = create_engine('postgresql://wnd2r:11aa22ss@localhost:5432/wnd2r',
                     poolclass=StaticPool)
 
 Base.metadata.create_all(engine)
