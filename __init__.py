@@ -22,7 +22,7 @@ import httplib2
 from flask import make_response
 
 # Create session, connect to db
-data = 'postgresql://wanderer:11aa22ss@localhost:5432/wanderer'
+data = 'postgresql://wnd2r:11aa22ss@localhost:5432/wnd2r'
 engine = create_engine(data)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
@@ -34,18 +34,19 @@ YELP_API_KEY = 'iZC1vkpIktmdJW4bNLjTuwbuWsdGDDm6C24vQ0oHe20XtH2V3ag_vs85iGroCNff
 
 # Load client_id for google oauth
 CLIENT_ID = json.loads(
-    open('/var/www/wnd2r/wnd2r/static/js/client_secrets.json', 'r').read())['web']['client_id']
+    open('static/js/client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "wanderer"
 
 
 # render main page
 @app.route("/")
 def showMainPage():
-    places = session.query(Place).all()
-    return render_template('index.html', places=places)
+    #places = session.query(Place).all()
+    return render_template('places.html')
 
 
 # request data from Yelp API
+'''
 @app.route("/api/get/place")
 def getPlaceInfo():
     # request parameters contain term and location of requested place
@@ -140,13 +141,13 @@ def deletePlace(place_id):
         # make sure user wants to delete place
         return render_template('deletePlace.html',
                                place=place_to_delete)
-
+'''
 
 # Google OAuth
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if request.args.get('state') != login_session['state']:
+    if request.args.get('state') != login_session['_csrf_token']:
         print "invalid state parameter"
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -157,7 +158,7 @@ def gconnect():
     try:
         print "trying to upgrade auth code"
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('/var/www/nmap/nmap/static/js/client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('static/js/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -286,22 +287,13 @@ def gdisconnect():
         return render_template('logout.html',
                                user_status=status)
 
-
-@app.route('/login')
-def showLogin():
-    # generate random state
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in range(32))
-    login_session['state'] = state
-    return render_template('login.html', STATE=state)
-
-
+'''
 # API Endpoint: List of topics (JSON)
 @app.route('/places/JSON')
 def placesJSON():
     places = session.query(Place).all()
     return jsonify(Places=[i.serialize for i in places])
-
+'''
 
 # create new user with login session info
 def createUser(login_session):
@@ -332,12 +324,14 @@ def checkUser(login_session):
     else:
         return user
 
+'''
 def getCategoryId(name):
     try:
         category = session.query(Category).filter_by(name=name).one()
         return category.id
     except:
         return None
+'''
 
 # get user id 
 def getUserId(email):
@@ -346,6 +340,16 @@ def getUserId(email):
         return user.id
     except:
         return None
+
+
+def generateCSRFToken():
+    # generate random state
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in range(32))
+    login_session['_csrf_token'] = state
+    return login_session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generateCSRFToken 
 
 
 app.secret_key = 'trgapsklfhjdsflehfjLKJHBLKHNN*YI*YFNO&Iry3noi837rhyg&*&*$#*#*YR&*O#YR#Y$(POUFHLUHFDY'
