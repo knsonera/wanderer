@@ -34,7 +34,7 @@ YELP_API_KEY = 'iZC1vkpIktmdJW4bNLjTuwbuWsdGDDm6C24vQ0oHe20XtH2V3ag_vs85iGroCNff
 
 # Load client_id for google oauth
 CLIENT_ID = json.loads(
-    open('static/js/client_secrets.json', 'r').read())['web']['client_id']
+    open('/vagrant/wanderer/static/js/client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "wanderer"
 
 
@@ -158,8 +158,9 @@ def gconnect():
     try:
         print "trying to upgrade auth code"
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('static/js/client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/vagrant/wanderer/static/js/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
+        print code
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         print "failed to upgrade the authorization code"
@@ -352,7 +353,7 @@ def generateCSRFToken():
 app.jinja_env.globals['csrf_token'] = generateCSRFToken 
 
 
-app.secret_key = 'trgapsklfhjdsflehfjLKJHBLKHNN*YI*YFNO&Iry3noi837rhyg&*&*$#*#*YR&*O#YR#Y$(POUFHLUHFDY'
+app.secret_key = 'trgapsklfhjdsflehfjLKJATLKHNN*YI*YFNO&Iry3noi837rhyg&*&*$#*#*YR&*O#YR#Y$(POUFHLUHFDY'
 
 if __name__ == "__main__":
     app.debug = True
