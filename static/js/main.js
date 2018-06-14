@@ -68,6 +68,12 @@ function CenterControl(controlDiv, map) {
       infowindow.setContent(infoNewPlaceContent);
       infowindow.setPosition(latLng);
       infowindow.open(map);
+      setTimeout(function() {
+
+      }, 1000)
+      document.getElementById("newPlaceLat").value = latitude;
+      document.getElementById("newPlaceLng").value = longitude;
+
     });
   });
 }
@@ -349,10 +355,25 @@ var infoNewPlaceContent = '<div class="new-place">' +
                                     '<input type="text" name="name" class="form-control" id="newPlaceName" placeholder="Name" maxlength=80 required>' +
                                 '</div>' +
                                 '<div class="form-group new-place-form">' +
-                                    '<input type="text" name="category" class="form-control" id="newPlaceMilk" placeholder="Category" maxlength=80 required>' +
+                                    '<textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea>' +
+                                '</div>' +
+                                '<div class="form-group new-place-form-hidden">' +
+                                    '<input type="text" name="lat" class="form-control" id="newPlaceLat" placeholder="Lat" maxlength=80 required>' +
+                                '</div>' +
+                                '<div class="form-group new-place-form-hidden">' +
+                                    '<input type="text" name="lng" class="form-control" id="newPlaceLng" placeholder="Lng" maxlength=80 required>' +
                                 '</div>' +
                                 '<div class="form-group new-place-form">' +
-                                    '<textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea>' +
+                                    '<select class="form-control new-place-form" name="category" id="newPlaceCategory" required>' +
+                                      '<option class="new-place-form" value="coffee">Coffee Shop</option>' +
+                                      '<option class="new-place-form" value="dining">Dining</option>' +
+                                      '<option class="new-place-form" value="bars">Bars & Clubs</option>' +
+                                      '<option class="new-place-form" value="tourist">Touristy Spots</option>' +
+                                      '<option class="new-place-form" value="outdoors">Outdoors</option>' +
+                                      '<option class="new-place-form" value="local">Local Gems</option>' +
+                                      '<option class="new-place-form" value="kids">Kid-friendly</option>' +
+                                      '<option class="new-place-form" value="etc">This And That</option>' +
+                                    '</select>' +
                                 '</div>' +
                                 '<div class="new-place-button-group">' +
                                     '<button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button>' +

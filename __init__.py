@@ -257,12 +257,14 @@ def gdisconnect():
                                  401)
         response.headers['Content-Type'] = 'application/json'
         status = "Current user not connected."
-        return render_template('logout.html',
+        return render_template('places.html',
                                user_status=status)
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
         % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
+
+    print result['status']
 
     if result['status'] == '200':
         print 'status 200'
@@ -276,16 +278,23 @@ def gdisconnect():
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         status = "Successfully disconnected."
-        return render_template('logout.html',
+        return render_template('places.html',
                                user_status=status)
     else:
+        # temporary fix, error 400
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
         print 'Failed to revoke token for given user.'
         response = make_response(
             json.dumps('Failed to revoke token for given user.'), 400
         )
         response.headers['Content-Type'] = 'application/json'
         status = "Failed to revoke token for given user."
-        return render_template('logout.html',
+        return render_template('places.html',
                                user_status=status)
 
 '''
