@@ -10,7 +10,8 @@ function initializeMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 12,
     center: { lat: 47.62, lng: -122.27 },
-    styles: mapStyle
+    styles: mapStyle,
+    fullscreenControl: false
   });
   infowindow = new google.maps.InfoWindow({
     content: '',
@@ -41,7 +42,7 @@ function CenterControl(controlDiv, map) {
   controlUI.style.borderRadius = '3px';
   controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
   controlUI.style.cursor = 'pointer';
-  controlUI.style.marginBottom = '0px';
+  controlUI.style.marginTop = '10px';
   controlUI.style.marginRight = '13px';
   controlUI.style.textAlign = 'center';
   controlUI.title = 'Click to recenter the map';
@@ -51,16 +52,23 @@ function CenterControl(controlDiv, map) {
   var controlText = document.createElement('div');
   controlText.style.color = 'rgb(25,25,25)';
   controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-  controlText.style.fontSize = '20px';
+  controlText.style.fontSize = '14px';
   controlText.style.lineHeight = '25px';
   controlText.style.paddingLeft = '5px';
   controlText.style.paddingRight = '5px';
-  controlText.innerHTML = '+';
+  controlText.innerHTML = 'Add New Point';
   controlUI.appendChild(controlText);
 
   // Setup the click event listeners: simply set the map to Chicago.
   controlUI.addEventListener('click', function () {
-    map.setCenter(chicago);
+    google.maps.event.addListenerOnce(map, "click", function (event) {
+      var latitude = event.latLng.lat();
+      var longitude = event.latLng.lng();
+      var latLng = event.latLng;
+      infowindow.setContent(infoNewPlaceContent);
+      infowindow.setPosition(latLng);
+      infowindow.open(map);
+    });
   });
 }
 
@@ -331,6 +339,28 @@ var mapStyle = [
     ]
   }
 ]
+
+var infoNewPlaceContent = '<div class="new-place">' +
+                            '<h5 class="new-place-title">' +
+                                '<span>Create new place</span>' +
+                            '</h5>' +
+                            '<form action="#" method="post">' +
+                                '<div class="form-group new-place-form">' +
+                                    '<input type="text" name="name" class="form-control" id="newPlaceName" placeholder="Name" maxlength=80 required>' +
+                                '</div>' +
+                                '<div class="form-group new-place-form">' +
+                                    '<input type="text" name="category" class="form-control" id="newPlaceMilk" placeholder="Category" maxlength=80 required>' +
+                                '</div>' +
+                                '<div class="form-group new-place-form">' +
+                                    '<textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea>' +
+                                '</div>' +
+                                '<div class="new-place-button-group">' +
+                                    '<button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button>' +
+                                    '<a role="button" class="btn btn-sm btn-outline-secondary ml-2" href="{{url_for(\'showMainPage\')}}">' +
+                                        'Back</a>' +
+                                '</div>' +
+                            '</form>' +
+                          '</div>';
 
 
 // add map to the dom
