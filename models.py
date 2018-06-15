@@ -29,6 +29,7 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    description = Column(String(250), nullable=False)
     user_id = Column(Integer, ForeignKey('appuser.id'))
     user = relationship(AppUser)
 
@@ -37,6 +38,8 @@ class Category(Base):
         """Return object data in easily serializeable format"""
         return {
             'name': self.name,
+            'description': self.description,
+            'user_id': self.user_id,
             'id': self.id,
         }
 

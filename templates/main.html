@@ -35,19 +35,23 @@
         <header class="blog-header py-3">
             <div class="row flex-nowrap justify-content-between align-items-center">
                 <div class="col-4 pt-1">
-                    <a class="text-muted" href="#myplaces">My Places</a>
+                    {%if 'username' in session %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="categoryElem" data-toggle="modal" data-target="#exampleModalCenter2">
+                        My categories
+                    </button>
+                    {% endif %}
                 </div>
                 <div class="col-4 text-center">
                     <a class="blog-header-logo" href="/">Wanderer</a>
                 </div>
                 <div class="col-4 d-flex justify-content-end align-items-center">
                     {%if 'username' not in session %}
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModalCenter1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="loginElem" data-toggle="modal" data-target="#exampleModalCenter1">
                         Sign in
                     </button>
                     {% else %}
                     <a class="header-login-info text-secondary" href="{{url_for('gdisconnect')}}">
-                        <span class="header-username">{{session["username"]}}</span> (Logout)</a>
+                        <span class="header-username" id="logoutElem">{{session["username"]}}</span> (Logout)</a>
                     {% endif %}
                 </div>
             </div>
@@ -96,6 +100,46 @@
                     </div>
                     <div class="modal-footer">
                         <p class="mt-5 mb-3 mr-5" id="signinCopy">&copy; 2018</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Categories Modal -->
+        <div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoriesTitle">My Categories</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>What's in my list?</h6>
+                        <ul class="list-group my-category-list">
+                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item">Test category 1 <span class="badge badge-secondary badge-pill">6</span></li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item">Test category 2 <span class="badge badge-secondary badge-pill">2</span></li>
+                        </ul>
+                        <div class="create-new-category">
+                            <h6 class="new-category-title">
+                                <span>Create new category</span>
+                            </h6>
+                            <form action="#" method="post">
+                                <div class="form-group new-category-form">
+                                    <input type="text" name="name" class="form-control" id="newCategoryName" placeholder="Category Name" maxlength=20 required>
+                                </div>
+                                <div class="form-group new-category-form-hidden">
+                                    <input type="text" name="label" class="form-control" id="newCategoryLabel" placeholder="Category Label" maxlength=20 required>
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary new-category-submit">Create</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+
                     </div>
                 </div>
             </div>
