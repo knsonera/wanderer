@@ -45,7 +45,7 @@ function CenterControl(controlDiv, map) {
   controlUI.style.marginTop = '10px';
   controlUI.style.marginRight = '13px';
   controlUI.style.textAlign = 'center';
-  controlUI.title = 'Click to recenter the map';
+  controlUI.title = 'Create new point on map (for authenticated users)';
   controlDiv.appendChild(controlUI);
 
   // Set CSS for the control interior.
@@ -61,20 +61,31 @@ function CenterControl(controlDiv, map) {
 
   // Setup the click event listeners: simply set the map to Chicago.
   controlUI.addEventListener('click', function () {
-    google.maps.event.addListenerOnce(map, "click", function (event) {
-      var latitude = event.latLng.lat();
-      var longitude = event.latLng.lng();
-      var latLng = event.latLng;
-      infowindow.setContent(infoNewPlaceContent);
-      infowindow.setPosition(latLng);
-      infowindow.open(map);
-      setTimeout(function() {
-
-      }, 1000)
-      document.getElementById("newPlaceLat").value = latitude;
-      document.getElementById("newPlaceLng").value = longitude;
-
-    });
+    if (document.getElementById('logoutElem')) {
+      map.setOptions({draggableCursor: 'copy'});
+      google.maps.event.addListenerOnce(map, "click", function (event) {
+        history.pushState(null, null, "/places/new");
+        google.maps.event.addListenerOnce(infowindow, 'closeclick', (function () {
+          return function () {
+            history.pushState(null, null, "/");
+          }
+        })());
+        map.setOptions({draggableCursor: 'auto'});
+        var latitude = event.latLng.lat();
+        var longitude = event.latLng.lng();
+        var latLng = event.latLng;
+        infowindow.setContent(infoNewPlaceContent);
+        infowindow.setPosition(latLng);
+        infowindow.open(map);
+        document.getElementById("newPlaceLat").value = latitude;
+        document.getElementById("newPlaceLng").value = longitude;
+  
+      });
+    } else {
+      var loginButton = document.getElementById('loginElem');
+      loginButton.click();
+    }
+    
   });
 }
 
@@ -375,14 +386,11 @@ var infoNewPlaceContent = '<div class="new-place">' +
                                       '<option class="new-place-form" value="etc">This And That</option>' +
                                     '</select>' +
                                 '</div>' +
-                                '<div class="new-place-button-group">' +
+                                '<div>' +
                                     '<button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button>' +
-                                    '<a role="button" class="btn btn-sm btn-outline-secondary ml-2" href="{{url_for(\'showMainPage\')}}">' +
-                                        'Back</a>' +
                                 '</div>' +
                             '</form>' +
                           '</div>';
-
 
 // add map to the dom
 try {

@@ -84,19 +84,28 @@ def getPlaceCoords():
     r = Response(response=content, status=200, mimetype="application/json")
     r.headers["Content-Type"] = "application/json; charset=utf-8"
     return r
-
+'''
 
 # Create new place
-@app.route('/places/new/', methods=['GET', 'POST'])
+@app.route('/places/new', methods=['GET', 'POST'])
 def newPlace():
     # check user id, only admin can create points
     user_id = getUserId(login_session['email'])
+    '''
     if login_session['user_id'] != 1:
         return "<script>function myFunction() {\
                 alert('Not authorized.');\
             }</script><body onload='myFunction()'>"
+    '''
     # add place to database on POST
     if request.method == 'POST':
+        print request.form['name']
+        print request.form['category']
+        print request.form['description']
+        print request.form['lat']
+        print request.form['lng']
+        print user_id
+        
         category = request.form['category']
         category_id = getCategoryId(category)
         if category_id == None:
@@ -114,13 +123,13 @@ def newPlace():
         session.add(newPlace)
         session.commit()
         # redirect to main page
+
         return redirect(url_for('showMainPage'))
     else:
         # show forms to create new place on GET
-        places = session.query(Place).all()
-        return render_template('newPlace.html', places=places)
+        return redirect(url_for('showMainPage'))
 
-
+'''
 @app.route('/places/delete/<int:place_id>/', methods=['GET', 'POST'])
 def deletePlace(place_id):
     # get place to delete from database
@@ -236,9 +245,9 @@ def gconnect():
 
     # Show info about user
     output = ''
-    output += '<h3 class="google-title">Welcome, '
+    output += '<h5 class="google-title">Welcome, '
     output += login_session['username']
-    output += '!</h3>'
+    output += '!</h5>'
     output += '<img src="'
     output += login_session['picture']
     output += ' " style = "width: 100px; height: 100px;border-radius: 150px;\
@@ -334,14 +343,14 @@ def checkUser(login_session):
     else:
         return user
 
-'''
+
 def getCategoryId(name):
     try:
         category = session.query(Category).filter_by(name=name).one()
         return category.id
     except:
         return None
-'''
+
 
 # get user id 
 def getUserId(email):
