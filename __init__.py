@@ -11,7 +11,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 # Add CRUD operations
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, Place, AppUser
+from models import Base, Place, AppUser, Category
 
 from flask import session as login_session
 from sqlalchemy.pool import StaticPool
@@ -306,13 +306,27 @@ def gdisconnect():
         return render_template('places.html',
                                user_status=status)
 
-'''
-# API Endpoint: List of topics (JSON)
-@app.route('/places/JSON')
+
+# API Endpoint: List of places (JSON)
+@app.route('/api/users/<int:user_id>/places')
 def placesJSON():
-    places = session.query(Place).all()
+    places = session.query(Place).filter_by(user_id=user_id);
     return jsonify(Places=[i.serialize for i in places])
-'''
+
+
+# API Endpoint: List of categories (JSON)
+@app.route('/api/users/<int:user_id>/categories')
+def categoriesJSON():
+    categories = session.query(Category).filter_by(user_id=user_id);
+    return jsonify(Categories=[i.serialize for i in categories])
+
+
+# API Endpoint: List of places in category (JSON)
+@app.route('/api/users/<int:user_id>/categories/<int:category_id>/places')
+def placesInCategoryJSON():
+    places = session.query(Places).filter_by(user_id=user_id, category_id=category_id);
+    return jsonify(Places=[i.serialize for i in places])
+
 
 # create new user with login session info
 def createUser(login_session):
