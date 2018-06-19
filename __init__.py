@@ -309,23 +309,23 @@ def gdisconnect():
 
 # API Endpoint: List of places (JSON)
 @app.route('/api/users/<int:user_id>/places')
-def placesJSON():
-    places = session.query(Place).filter_by(user_id=user_id);
+def placesJSON(user_id):
+    places = session.query(Place).filter_by(user_id=user_id).all();
     return jsonify(Places=[i.serialize for i in places])
 
 
 # API Endpoint: List of categories (JSON)
 @app.route('/api/users/<int:user_id>/categories')
-def categoriesJSON():
-    categories = session.query(Category).filter_by(user_id=user_id);
+def categoriesJSON(user_id):
+    categories = session.query(Category).filter_by(user_id=user_id).all();
     return jsonify(Categories=[i.serialize for i in categories])
 
 
 # API Endpoint: List of places in category (JSON)
 @app.route('/api/users/<int:user_id>/categories/<int:category_id>/places')
-def placesInCategoryJSON():
-    places = session.query(Places).filter_by(user_id=user_id, category_id=category_id);
-    return jsonify(Places=[i.serialize for i in places])
+def placesInCategoryJSON(user_id, category_id):
+    places = session.query(Place).filter_by(user_id=user_id, category_id=category_id).all();
+    return jsonify(PlacesInCategory=[i.serialize for i in places])
 
 
 # create new user with login session info
