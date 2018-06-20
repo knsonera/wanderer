@@ -1,6 +1,12 @@
 var UserCategoryModel = {};
 var UserPlaceModel = {};
 
+var placesData = [];
+
+placesData = loadUserPlaces(user_id, function(result) {
+    return result;
+})
+
 var ViewModel = function () {
     var self = this;
 

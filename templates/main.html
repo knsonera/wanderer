@@ -167,11 +167,7 @@
         </script>
         <script>
             function signInCallback(authResult) {
-                console.log('AUTH RESULT:');
-                console.log(authResult);
                 if (authResult['code']) {
-                    console.log(authResult['code'])
-
                     // Hide the sign-in button now that the user is authorized
                     $('#signinButton').attr('style', 'display: none');
                     $('#signinTitle').attr('style', 'display: none');
@@ -186,9 +182,18 @@
                         data: authResult['code'],
                         contentType: 'text/plain; charset=utf-8',
                         success: function (result) {
+                            current_user = result.User[0];
                             // Handle or verify the server response if necessary.
                             if (result) {
-                                $('#result').html(result + '</br> Redirecting...')
+                                userinfo = ''
+                                userinfo += '<h5 class="google-title">Welcome, '
+                                userinfo += current_user.name
+                                userinfo += '!</h5>'
+                                userinfo += '<img src="'
+                                userinfo += current_user.picture
+                                userinfo += ' " style = "width: 100px; height: 100px;border-radius: 150px;\
+                                #    -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+                                $('#result').html(userinfo + '</br> Redirecting...')
                                 setTimeout(function () {
                                     window.location.href = "/";
                                 }, 2000);

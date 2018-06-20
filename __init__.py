@@ -243,17 +243,11 @@ def gconnect():
     # Store the access token in the session.
     login_session['access_token'] = credentials.access_token
 
-    # Show info about user
-    output = ''
-    output += '<h5 class="google-title">Welcome, '
-    output += login_session['username']
-    output += '!</h5>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 100px; height: 100px;border-radius: 150px;\
-        -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    current_user_id = getUserId(login_session['email'])
+    current_user = session.query(AppUser).filter_by(id=current_user_id).all()
+
     print "returning result"
-    return output
+    return jsonify(User=[i.serialize for i in current_user])
 
 
 # Disconnect (Google OAuth)
