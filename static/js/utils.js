@@ -1,12 +1,14 @@
 'use strict';
 
 function loadUserCategories(loaded) {
+    console.log('categories: sending request');
     $.ajax({
         url: '/api/categories',
         dataType: 'json',
         success: function (json) {
+            console.log('categories received');
             if (json.hasOwnProperty('Categories') && json.Categories[0]) {
-                loaded(json.Cafes);
+                loaded(json.Categories);
             }
         },
         error: function () {
@@ -16,15 +18,12 @@ function loadUserCategories(loaded) {
 }
 
 function loadUserPlaces(category, loaded) {
-    var params = {};
-    if (category_id !== 'All') {
-        params = {'category': category};
-    }
-
+    console.log('places: sending request');
     $.ajax({
         url: '/api/places',
-        data: params,
+        data: {'category': category},
         success: function (json) {
+            console.log('places received');
             if (json.hasOwnProperty('Places') && json.Places[0]) {
                 loaded(json.Places);
             }

@@ -3,17 +3,19 @@ var ViewModel = function () {
 
     // define model
     self.selectedCategory = ko.observable("All");
-    self.currentPlace = ko.observable(places[0]);
+    self.currentPlace = ko.observable();
     self.categories = ko.observableArray([]);
     self.places = ko.observableArray([]);
     // (end) define model (end)
 
     loadUserCategories(function (loadedCategories) {
+        console.log("loading categories");
         self.categories(loadedCategories);
     });
 
     loadUserPlaces(self.selectedCategory(), function (loadedPlaces) {
-        updatePlacesOnMap(loadedPlaces); // TODO: implement
+        //updatePlacesOnMap(loadedPlaces); // TODO: implement
+        console.log("loading places");
         self.places(loadedPlaces);
     });
 
