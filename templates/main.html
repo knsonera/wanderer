@@ -58,9 +58,15 @@
         </header>
 
         <div class="nav-scroller py-1 mb-2">
+            {%if 'username' in session %}
             <nav class="nav d-flex justify-content-between" data-bind="foreach: categories">
                 <a class="p-2 text-muted" data-bind="text: description, click: $parent.setCurrentCategory"></a>
             </nav>
+            {% else %}
+            <nav class="nav d-flex justify-content-center">
+                <a class="p-2 ml-7 text-muted">Welcome to Wanderer - interactive map with all your favorite places on Earth! Please sign-in to start "wandering".</a>
+            </nav>
+            {% endif %}
         </div>
 
         <div class="wrapper">
@@ -195,11 +201,12 @@
                     $('#signinTitle').attr('style', 'display: none');
                     $('#signinCopy').attr('style', 'display: none');
 
+                    state_token = '{{csrf_token()}}';
 
                     // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main page
                     $.ajax({
                         type: 'POST',
-                        url: '/gconnect?state={{csrf_token()}}',
+                        url: '/gconnect?state=' + state_token,
                         processData: false,
                         data: authResult['code'],
                         contentType: 'text/plain; charset=utf-8',
@@ -227,6 +234,7 @@
                         }
 
                     });
+                    console.log();
                 }
             }
         </script>

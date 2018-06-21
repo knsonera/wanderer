@@ -54,8 +54,8 @@ def getCategories():
         print "returning result"
         return jsonify(Categories=[i.serialize for i in user_categories])
     else:
-        print "user not in session, redirect"
-        return redirect(url_for('showMainPage'))
+        print "user not in session"
+        return Response('User is not authenticated', status=200)
 
 
 # get places for current user
@@ -78,7 +78,8 @@ def getPlaces():
         print "returning result"
         return jsonify(Places=[i.serialize for i in user_places])
     else:
-        return redirect(url_for('showMainPage'))
+        print "user not in session"
+        return Response('User is not authenticated', status=200)
 
 
 # request data from Yelp API
@@ -196,6 +197,7 @@ def deletePlace(place_id):
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['_csrf_token']:
+        print login_session['_csrf_token']
         print "invalid state parameter"
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -316,7 +318,6 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
         del login_session['user_id']
-
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         status = "Successfully disconnected."
@@ -409,10 +410,12 @@ def getUserId(email):
 
 
 def generateCSRFToken():
+    print "generating csrf token"
     # generate random state
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['_csrf_token'] = state
+    print login_session['_csrf_token']
     return login_session['_csrf_token']
 
 app.jinja_env.globals['csrf_token'] = generateCSRFToken 

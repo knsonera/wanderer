@@ -12,7 +12,7 @@ function loadUserCategories(loaded) {
             }
         },
         error: function () {
-            alert('Category data is not available. Try again later');
+            //alert('Category data is not available. Try again later');
             loaded([]);
         }})
 }
@@ -29,7 +29,7 @@ function loadUserPlaces(category, loaded) {
             }
         },
         error: function () {
-            alert('Place data is not available. Try again later');
+            //alert('Place data is not available. Try again later');
             loaded([]);
         }})
 }
