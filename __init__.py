@@ -41,8 +41,36 @@ APPLICATION_NAME = "wanderer"
 # render main page
 @app.route("/")
 def showMainPage():
-    #places = session.query(Place).all()
     return render_template('places.html')
+
+
+# get all categories for current user
+@app.route("/api/categories", methods=['GET'])
+def getCategories():
+    if 'username' in login_session:
+        user_id = getUserId(login_session('email'));
+        user_categories = session.query(Category).filter_by(user_id).all()
+        return jsonify(Categories=[i.serialize for i in user_categories])
+    else:
+        return redirect(url_for('showMainPage'))
+
+
+# get places for current user
+@app.route("/api/places", methods=['GET'])
+def getPlaces():
+    if 'username' in login_session:
+        user_id = getUserId(login_session('email'))
+        current_category = request.args['category']
+        
+        if current_category == "All":
+            user_places = session.query(Place).filter_by(user_id).all()
+        else:
+            category_id = getCategoryId(current_category, user_id)
+            user_places = session.query(Place).filter_by(user_id, category_id).all()
+
+        return jsonify(Places=[i.serialize for i in user_places])
+    else:
+        return redirect(url_for('showMainPage'))
 
 
 # request data from Yelp API
@@ -91,12 +119,6 @@ def getPlaceCoords():
 def newPlace():
     # check user id, only admin can create points
     user_id = getUserId(login_session['email'])
-    '''
-    if login_session['user_id'] != 1:
-        return "<script>function myFunction() {\
-                alert('Not authorized.');\
-            }</script><body onload='myFunction()'>"
-    '''
     # add place to database on POST
     if request.method == 'POST':
         print request.form['name']
@@ -107,13 +129,13 @@ def newPlace():
         print user_id
         
         category = request.form['category']
-        category_id = getCategoryId(category)
+        category_id = getCategoryId(user_id, category)
         if category_id == None:
             newCategory = Category(name=request.form['name'],
                        user_id=user_id)
             session.add(newCategory)
             session.commit()
-            category_id = getCategoryId(category)
+            category_id = getCategoryId(user_id, category)
         newPlace = Place(name=request.form['name'],
                        description=request.form['description'],
                        lat=request.form['lat'],
@@ -352,9 +374,9 @@ def checkUser(login_session):
         return user
 
 
-def getCategoryId(name):
+def getCategoryId(name, user_id):
     try:
-        category = session.query(Category).filter_by(name=name).one()
+        category = session.query(Category).filter_by(name=name, user_id=user_id).one()
         return category.id
     except:
         return None
