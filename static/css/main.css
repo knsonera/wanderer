@@ -147,6 +147,10 @@ body .container {
   display: none;
 }
 
+.new-place-visible {
+  display: block;
+}
+
 #categoriesTitle {
   margin-left: 120px;
 }
@@ -192,6 +196,25 @@ body .container {
 .my-category-list-item {
   height: 30px;
   background-color: lightblue;
+}
+
+.my-category-list-item-text {
+  margin-right: 10px;
+}
+
+.my-category-delete {
+  position: absolute;
+  right: 12px;
+  top: 2px;
+  font-weight: bold;
+}
+
+.my-category-delete:hover {
+  text-decoration: none;
+}
+
+.my-category-badge {
+  margin-right: 10px;
 }
 
 input[type="text"] {

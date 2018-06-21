@@ -109,23 +109,20 @@
                     </div>
                     <div class="modal-body">
                         <h6>What's in my list?</h6>
-                        <ul class="list-group my-category-list data-bind="foreach: categories">
-                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item"> <span data-bind="text: description"></span> <span class="badge badge-secondary badge-pill">6</span></li>
+                        <ul class="list-group my-category-list" data-bind="foreach: categories">
+                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item">
+                                <span class="my-category-list-item-text" data-bind="text: description"></span> 
+                                <span class="badge badge-secondary badge-pill my-category-badge">6</span>
+                                <a class="my-category-delete" href="">x</a>
+                            </li>
                         </ul>
                         <div class="create-new-category">
                             <h6 class="new-category-title">
                                 <span>Create new category</span>
                             </h6>
                             <form action="/categories/new" method="post">
-                                <div class="form-group new-category-form">
-                                    <input type="text" name="name" class="form-control" id="newCategoryName" placeholder="Category Name" maxlength=20 required>
-                                </div>
-                                <div class="form-group new-category-form-hidden">
-                                    <input type="text" name="label" class="form-control" id="newCategoryLabel" placeholder="Category Label" maxlength=20 required>
-                                </div>
-                                <div>
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary new-category-submit">Create</button>
-                                </div>
+                                <input type="text" name="name" class="form-control new-category-form" id="newCategoryName" placeholder="Category Name" maxlength=20 required>
+                                <input type="submit" class="btn btn-sm btn-outline-secondary new-category-submit" value="Submit"/>
                             </form>
                         </div>
                     </div>
@@ -136,33 +133,33 @@
             </div>
         </div>
 
-        <div class="new-place-hidden">
-            <div class="new-place" id="newPlaceForm"> +
-                <h5 class="new-place-title"> +
-                    <span>Create new place</span> +
-                </h5> +
-                <form action="/places/new" method="post"> +
-                    <div class="form-group new-place-form"> +
-                        <input type="text" name="name" class="form-control" id="newPlaceName" placeholder="Name" maxlength=80 required> +
-                    </div> +
-                    <div class="form-group new-place-form"> +
-                        <textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea> +
-                    </div> +
-                    <div class="form-group new-place-form-hidden"> +
-                        <input type="text" name="lat" class="form-control" id="newPlaceLat" placeholder="Lat" maxlength=80 required> +
-                    </div> +
-                    <div class="form-group new-place-form-hidden"> +
-                        <input type="text" name="lng" class="form-control" id="newPlaceLng" placeholder="Lng" maxlength=80 required> +
-                    </div> +
-                    <div class="form-group new-place-form"> +
-                        <select class="form-control new-place-form" name="category" id="newPlaceCategory" data-bind="foreach: categories" required> +
-                          <option class="new-place-form" data-bind="text: description, attr:{value: name}"></option> +
-                        </select> +
-                    </div> +
-                    <div> +
-                        <button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button> +
-                    </div> +
-                </form> +
+        <div class="new-place-hidden" id="newPlaceForm">
+            <div class="new-place">
+                <h5 class="new-place-title">
+                    <span>Create new place</span>
+                </h5>
+                <form action="/places/new" method="post">
+                    <div class="form-group new-place-form">
+                        <input type="text" name="name" class="form-control" id="newPlaceName" placeholder="Name" maxlength=80 required>
+                    </div>
+                    <div class="form-group new-place-form">
+                        <textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea>
+                    </div>
+                    <div class="form-group new-place-form-hidden">
+                        <input type="text" name="lat" class="form-control" id="newPlaceLat" placeholder="Lat" maxlength=80 required>
+                    </div>
+                    <div class="form-group new-place-form-hidden">
+                        <input type="text" name="lng" class="form-control" id="newPlaceLng" placeholder="Lng" maxlength=80 required>
+                    </div>
+                    <div class="form-group new-place-form">
+                        <select class="form-control new-place-form" name="category" id="newPlaceCategory" data-bind="foreach: categories" required>
+                          <option class="new-place-form" data-bind="text: description, attr:{value: name}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -178,6 +175,10 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
             crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+        <script src="../static/js/main.js" type="text/javascript"></script>
+        <!-- app logic -->
+        <script src="../static/js/utils.js" type="text/javascript"></script>    
+        <script src="../static/js/app.js" type="text/javascript"></script>
         <script src="../static/js/main.js" type="text/javascript"></script>
         <!-- google maps api -->
         <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMbDSxqs3jlItqgrMyvLT5LlAeDM4BxUc&callback=initializeMap"

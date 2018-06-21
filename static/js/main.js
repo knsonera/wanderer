@@ -72,7 +72,10 @@ function CenterControl(controlDiv, map) {
         var latitude = event.latLng.lat();
         var longitude = event.latLng.lng();
         var latLng = event.latLng;
-        var infoNewPlaceContent = str(document.getElementById('newPlaceForm'));
+        var infoNewPlaceContentElem = document.getElementById('newPlaceForm');
+        infoNewPlaceContentHTML = infoNewPlaceContentElem.innerHTML;
+        infoNewPlaceContentHTML.className = 'new-place-visible';
+        infoNewPlaceContent = infoNewPlaceContentHTML;
         console.log(infoNewPlaceContent);
         infowindow.setContent(infoNewPlaceContent);
         infowindow.setPosition(latLng);

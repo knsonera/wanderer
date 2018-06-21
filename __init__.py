@@ -47,27 +47,35 @@ def showMainPage():
 # get all categories for current user
 @app.route("/api/categories", methods=['GET'])
 def getCategories():
+    print "getting categories"
     if 'username' in login_session:
-        user_id = getUserId(login_session('email'));
-        user_categories = session.query(Category).filter_by(user_id).all()
+        user_id = getUserId(login_session['email']);
+        user_categories = session.query(Category).filter_by(user_id=user_id).all()
+        print "returning result"
         return jsonify(Categories=[i.serialize for i in user_categories])
     else:
+        print "user not in session, redirect"
         return redirect(url_for('showMainPage'))
 
 
 # get places for current user
 @app.route("/api/places", methods=['GET'])
 def getPlaces():
+    print "getting places"
     if 'username' in login_session:
-        user_id = getUserId(login_session('email'))
+        user_id = getUserId(login_session['email'])
+        print user_id
         current_category = request.args['category']
         
         if current_category == "All":
-            user_places = session.query(Place).filter_by(user_id).all()
+            print "category equals All"
+            user_places = session.query(Place).filter_by(user_id=user_id).all()
         else:
+            print current_category
             category_id = getCategoryId(current_category, user_id)
-            user_places = session.query(Place).filter_by(user_id, category_id).all()
+            user_places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=category_id).all()
 
+        print "returning result"
         return jsonify(Places=[i.serialize for i in user_places])
     else:
         return redirect(url_for('showMainPage'))
@@ -113,6 +121,29 @@ def getPlaceCoords():
     r.headers["Content-Type"] = "application/json; charset=utf-8"
     return r
 '''
+
+# Create new place
+@app.route('/categories/new', methods=['POST'])
+def newCategory():
+    print "creating new category"
+    # check user id, only admin can create points
+    user_id = getUserId(login_session['email'])
+    # add place to database on POST
+    if request.method == 'POST':
+        print "method POST"
+        categoryNameRaw = request.form['name']
+        categoryName = categoryNameRaw.replace(' ', '').lower()
+        print categoryName
+        createdCategory = Category(name=categoryName,
+                       description=request.form['name'],
+                       user_id=user_id)
+        session.add(createdCategory)
+        session.commit()
+        # redirect to main page
+        return redirect(url_for('showMainPage'))
+    else:
+        # show forms to create new place on GET
+        return redirect(url_for('showMainPage'))
 
 # Create new place
 @app.route('/places/new', methods=['GET', 'POST'])
