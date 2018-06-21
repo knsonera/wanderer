@@ -152,21 +152,8 @@ def newPlace():
     user_id = getUserId(login_session['email'])
     # add place to database on POST
     if request.method == 'POST':
-        print request.form['name']
-        print request.form['category']
-        print request.form['description']
-        print request.form['lat']
-        print request.form['lng']
-        print user_id
-        
         category = request.form['category']
         category_id = getCategoryId(user_id, category)
-        if category_id == None:
-            newCategory = Category(name=request.form['name'],
-                       user_id=user_id)
-            session.add(newCategory)
-            session.commit()
-            category_id = getCategoryId(user_id, category)
         newPlace = Place(name=request.form['name'],
                        description=request.form['description'],
                        lat=request.form['lat'],
