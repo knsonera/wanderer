@@ -1,30 +1,30 @@
-var UserCategoryModel = {};
-var UserPlaceModel = {};
-
-var placesData = [];
-
-placesData = loadUserPlaces(user_id, function(result) {
-    return result;
-})
-
 var ViewModel = function () {
     var self = this;
 
+    // define model
     self.selectedCategory = ko.observable("All");
+    self.currentPlace = ko.observable(places[0]);
+    self.categories = ko.observableArray([]);
+    self.places = ko.observableArray([]);
+    // (end) define model (end)
 
-    self.filteredPlaces = ko.computed(function () {
-        var category = self.selectedCategory();
-        if (category === "All") {
-            //loadUserPlaces(user_id, function(result) {
-            //    return result;
-            //}
-        } else {
-            //loadUserPlacesInCategory(user_id, category_id, function(result) {
-            //    return result;
-            //}
-        }
+    loadUserCategories(function (loadedCategories) {
+        self.categories(loadedCategories);
     });
 
-    _viewModel = new ViewModel();
-    ko.applyBindings(_viewModel);
+    loadUserPlaces(self.selectedCategory(), function (loadedPlaces) {
+        updatePlacesOnMap(loadedPlaces); // TODO: implement
+        self.places(loadedPlaces);
+    });
+
+    self.setCurrentCategory = function (category) {
+        self.selectedCategory(category);
+    };
+
+    self.setCurrentPlace = function (place) {
+        self.currentPlace(place);
+    };
 }
+
+_viewModel = new ViewModel();
+ko.applyBindings(_viewModel);
