@@ -163,7 +163,6 @@ def newPlace():
         session.add(newPlace)
         session.commit()
         # redirect to main page
-
         return redirect(url_for('showMainPage'))
     else:
         # show forms to create new place on GET
