@@ -1,6 +1,8 @@
-function loadUserCategories(user_id, loaded) {
+'use strict';
+
+function loadUserCategories(loaded) {
     $.ajax({
-        url: '/api/users/' + user_id + '/categories',
+        url: '/api/categories',
         dataType: 'json',
         success: function (json) {
             if (json.hasOwnProperty('Categories') && json.Categories[0]) {
@@ -13,25 +15,15 @@ function loadUserCategories(user_id, loaded) {
         }})
 }
 
-function loadUserPlaces(user_id, loaded) {
-    $.ajax({
-        url: '/api/users/' + user_id + '/places',
-        dataType: 'json',
-        success: function (json) {
-            if (json.hasOwnProperty('Places') && json.Places[0]) {
-                loaded(json.Places);
-            }
-        },
-        error: function () {
-            alert('Place data is not available. Try again later');
-            loaded([]);
-        }})
-}
+function loadUserPlaces(category, loaded) {
+    var params = {};
+    if (category_id !== 'All') {
+        params = {'category': category};
+    }
 
-function loadUserPlacesInCategory(user_id, category_id, loaded) {
     $.ajax({
-        url: '/api/users/' + user_id + '/categories/' + category_id + '/places',
-        dataType: 'json',
+        url: '/api/places',
+        data: params,
         success: function (json) {
             if (json.hasOwnProperty('Places') && json.Places[0]) {
                 loaded(json.Places);
