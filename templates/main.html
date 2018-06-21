@@ -58,16 +58,8 @@
         </header>
 
         <div class="nav-scroller py-1 mb-2">
-            <nav class="nav d-flex justify-content-between">
-                <a class="p-2 text-muted" href="#all">All</a>
-                <a class="p-2 text-muted" href="#coffee">Coffee Shops</a>
-                <a class="p-2 text-muted" href="#dining">Dining</a>
-                <a class="p-2 text-muted" href="#bars">Bars & Clubs</a>
-                <a class="p-2 text-muted" href="#tourist">Touristy Spots</a>
-                <a class="p-2 text-muted" href="#outdoors">Outdoors</a>
-                <a class="p-2 text-muted" href="#local">Local Gems</a>
-                <a class="p-2 text-muted" href="#kids">Kid-friendly</a>
-                <a class="p-2 text-muted" href="#etc">This And That</a>
+            <nav class="nav d-flex justify-content-between" data-bind="foreach: categories">
+                <a class="p-2 text-muted" data-bind="text: description, click: $parent.setCurrentCategory"></a>
             </nav>
         </div>
 
@@ -117,15 +109,14 @@
                     </div>
                     <div class="modal-body">
                         <h6>What's in my list?</h6>
-                        <ul class="list-group my-category-list">
-                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item">Test category 1 <span class="badge badge-secondary badge-pill">6</span></li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item">Test category 2 <span class="badge badge-secondary badge-pill">2</span></li>
+                        <ul class="list-group my-category-list data-bind="foreach: categories">
+                            <li class="list-group-item d-flex justify-content-between align-items-center my-category-list-item"> <span data-bind="text: description"></span> <span class="badge badge-secondary badge-pill">6</span></li>
                         </ul>
                         <div class="create-new-category">
                             <h6 class="new-category-title">
                                 <span>Create new category</span>
                             </h6>
-                            <form action="#" method="post">
+                            <form action="/categories/new" method="post">
                                 <div class="form-group new-category-form">
                                     <input type="text" name="name" class="form-control" id="newCategoryName" placeholder="Category Name" maxlength=20 required>
                                 </div>
@@ -144,6 +135,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="new-place new-place-hidden" id="newPlaceForm"> +
+                <h5 class="new-place-title"> +
+                    <span>Create new place</span> +
+                </h5> +
+                <form action="/places/new" method="post"> +
+                    <div class="form-group new-place-form"> +
+                        <input type="text" name="name" class="form-control" id="newPlaceName" placeholder="Name" maxlength=80 required> +
+                    </div> +
+                    <div class="form-group new-place-form"> +
+                        <textarea class="form-control" name="description" id="newPlaceDesc" placeholder="Description" rows="3" maxlength=500 required></textarea> +
+                    </div> +
+                    <div class="form-group new-place-form-hidden"> +
+                        <input type="text" name="lat" class="form-control" id="newPlaceLat" placeholder="Lat" maxlength=80 required> +
+                    </div> +
+                    <div class="form-group new-place-form-hidden"> +
+                        <input type="text" name="lng" class="form-control" id="newPlaceLng" placeholder="Lng" maxlength=80 required> +
+                    </div> +
+                    <div class="form-group new-place-form"> +
+                        <select class="form-control new-place-form" name="category" id="newPlaceCategory" data-bind="foreach: categories" required> +
+                          <option class="new-place-form" data-bind="text: description, attr:{value: name}"></option> +
+                        </select> +
+                    </div> +
+                    <div> +
+                        <button type="submit" class="btn btn-sm btn-outline-secondary new-place-submit">Create</button> +
+                    </div> +
+                </form> +
+              </div>
 
         <!-- Bootstrap core JavaScript
     ================================================== -->

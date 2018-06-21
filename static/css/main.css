@@ -143,6 +143,10 @@ body .container {
   font-weight: bold;
 }
 
+.new-place-hidden {
+  display: none;
+}
+
 #categoriesTitle {
   margin-left: 120px;
 }
