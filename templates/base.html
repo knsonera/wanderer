@@ -60,7 +60,7 @@
         <div class="nav-scroller py-1 mb-2">
             {%if 'username' in session %}
             <nav class="nav d-flex justify-content-between" data-bind="foreach: categories">
-                <a class="p-2 text-muted" data-bind="text: description, click: $parent.setCurrentCategory"></a>
+                <a class="p-2 text-muted" href="" data-bind="text: description, click: $parent.setCurrentCategory, css: {categoryClicked: $data.name == $parent.selectedCategory().name"></a>
             </nav>
             {% else %}
             <nav class="nav d-flex justify-content-center">

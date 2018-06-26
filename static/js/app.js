@@ -2,10 +2,11 @@ var ViewModel = function () {
     var self = this;
 
     // define model
-    self.selectedCategory = ko.observable("All");
-    self.currentPlace = ko.observable();
+    var showAll = {description: "All", id: 0, name: "all", user_id: 0}
     self.categories = ko.observableArray([]);
     self.places = ko.observableArray([]);
+    self.selectedCategory = ko.observable(showAll);
+    self.currentPlace = ko.observable();
     // (end) define model (end)
 
     loadUserCategories(function (loadedCategories) {
@@ -20,6 +21,7 @@ var ViewModel = function () {
     });
 
     self.setCurrentCategory = function (category) {
+        console.log('changing current category to ' + category.name);
         self.selectedCategory(category);
     };
 
