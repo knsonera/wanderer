@@ -41,7 +41,7 @@ APPLICATION_NAME = "wanderer"
 # render main page
 @app.route("/")
 def showMainPage():
-    return render_template('places.html')
+    return render_template('base.html')
 
 
 # get all categories for current user
@@ -63,17 +63,19 @@ def getCategories():
 def getPlaces():
     print "getting places"
     if 'username' in login_session:
-        user_id = getUserId(login_session['email'])
-        print user_id
+        print "getting current user id:"
+        current_user_id = getUserId(login_session['email'])
+        print current_user_id
         current_category = request.args['category']
         
         if current_category == "All":
             print "category equals All"
-            user_places = session.query(Place).filter_by(user_id=user_id).all()
+            user_places = session.query(Place).filter_by(user_id=current_user_id).all()
+            print len(user_places)
         else:
             print current_category
-            category_id = getCategoryId(current_category, user_id)
-            user_places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=category_id).all()
+            current_category_id = getCategoryId(current_category, current_user_id)
+            user_places = session.query(Place).filter_by(user_id=current_user_id).filter_by(category_id=current_category_id).all()
 
         print "returning result"
         return jsonify(Places=[i.serialize for i in user_places])
@@ -81,47 +83,6 @@ def getPlaces():
         print "user not in session"
         return Response('User is not authenticated', status=200)
 
-
-# request data from Yelp API
-'''
-@app.route("/api/get/place")
-def getPlaceInfo():
-    # request parameters contain term and location of requested place
-    term = request.args.get('term')
-    location = request.args.get('location')
-
-    http = httplib2.Http()
-    # headers of the request contain Yelp API key
-    headers = {'Authorization': 'Bearer ' + YELP_API_KEY}
-    url = 'https://api.yelp.com/v3/businesses/search?term=' + \
-        term + '&location=' + location
-    # replacing spaces with url encoding
-    url = url.replace(' ', '%20')
-    _, content = http.request(url, 'GET', headers=headers)
-
-    # return json object with data
-    r = Response(response=content, status=200, mimetype="application/json")
-    r.headers["Content-Type"] = "application/json; charset=utf-8"
-    return r
-
-# request data from google maps geocoding
-@app.route("/api/get/coords")
-def getPlaceCoords():
-    # request parameters contain term and location of requested place
-    address = request.args.get('address')
-    http = httplib2.Http()
-    # headers of the request contain Yelp API key
-    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + \
-        address + '&key=AIzaSyCMbDSxqs3jlItqgrMyvLT5LlAeDM4BxUc'
-    # replacing spaces with url encoding
-    url = url.replace(' ', '%20')
-    _, content = http.request(url, 'GET')
-
-    # return json object with data
-    r = Response(response=content, status=200, mimetype="application/json")
-    r.headers["Content-Type"] = "application/json; charset=utf-8"
-    return r
-'''
 
 # Create new place
 @app.route('/categories/new', methods=['POST'])
@@ -147,7 +108,7 @@ def newCategory():
         return redirect(url_for('showMainPage'))
 
 # Create new place
-@app.route('/places/new', methods=['GET', 'POST'])
+@app.route('/places/new', methods=['POST'])
 def newPlace():
     # check user id, only admin can create points
     user_id = getUserId(login_session['email'])
@@ -155,42 +116,29 @@ def newPlace():
     if request.method == 'POST':
         category = request.form['category']
         category_id = getCategoryId(user_id, category)
+        print request.form['name']
+        print request.form['description']
+        print request.form['lat']
+        print request.form['lng']
+        print category_id
+        print request.form['category']
+        print user_id
+        '''
         newPlace = Place(name=request.form['name'],
                        description=request.form['description'],
                        lat=request.form['lat'],
                        lng=request.form['lng'],
+                       yelpData={},
                        category_id=category_id,
                        user_id=user_id)
         session.add(newPlace)
         session.commit()
         # redirect to main page
+        '''
         return redirect(url_for('showMainPage'))
     else:
         # show forms to create new place on GET
         return redirect(url_for('showMainPage'))
-
-'''
-@app.route('/places/delete/<int:place_id>/', methods=['GET', 'POST'])
-def deletePlace(place_id):
-    # get place to delete from database
-    place_to_delete = session.query(Place).filter_by(id=place_id).one()
-    # Check if user is allowed to delete topic, show js alert
-    if login_session['user_id'] != 1:
-        return "<script>function myFunction() {\
-                alert('Not authorized.');\
-            }</script><body onload='myFunction()'>"
-    # delete place from db on POST
-    if request.method == 'POST':
-        session.delete(place_to_delete)
-        session.commit()
-        # TODO: flash on success?
-        # redirect to main page
-        return redirect(url_for('showMainPage'))
-    else:
-        # make sure user wants to delete place
-        return render_template('deletePlace.html',
-                               place=place_to_delete)
-'''
 
 # Google OAuth
 @app.route('/gconnect', methods=['POST'])
@@ -358,7 +306,7 @@ def categoriesJSON(user_id):
 # API Endpoint: List of places in category (JSON)
 @app.route('/api/users/<int:user_id>/categories/<int:category_id>/places')
 def placesInCategoryJSON(user_id, category_id):
-    places = session.query(Place).filter_by(user_id=user_id, category_id=category_id).all();
+    places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=category_id).all();
     return jsonify(PlacesInCategory=[i.serialize for i in places])
 
 
@@ -392,21 +340,73 @@ def checkUser(login_session):
         return user
 
 
-def getCategoryId(name, user_id):
+def getCategoryId(user_name, user_id):
+    print "getCategoryId"
+    print user_name
+    print user_id
     try:
-        category = session.query(Category).filter_by(name=name, user_id=user_id).one()
+        category = session.query(Category).filter_by(name=user_name).filter_by(user_id=user_id).one()
+        print category.id
         return category.id
     except:
         return None
 
 
 # get user id 
-def getUserId(email):
+def getUserId(user_email):
+    print "getUserId:"
+    print login_session['email']
     try:
-        user = session.query(AppUser).filter_by(email=email).one()
+        print "trying to obtain user data from db"
+        user = session.query(AppUser).filter_by(email=login_session['email']).one()
+        print user.name
+        print user.id
         return user.id
     except:
         return None
+
+
+# request data from Yelp API
+'''
+@app.route("/api/get/place")
+def getPlaceInfo():
+    # request parameters contain term and location of requested place
+    term = request.args.get('term')
+    location = request.args.get('location')
+
+    http = httplib2.Http()
+    # headers of the request contain Yelp API key
+    headers = {'Authorization': 'Bearer ' + YELP_API_KEY}
+    url = 'https://api.yelp.com/v3/businesses/search?term=' + \
+        term + '&location=' + location
+    # replacing spaces with url encoding
+    url = url.replace(' ', '%20')
+    _, content = http.request(url, 'GET', headers=headers)
+
+    # return json object with data
+    r = Response(response=content, status=200, mimetype="application/json")
+    r.headers["Content-Type"] = "application/json; charset=utf-8"
+    return r
+
+# request data from google maps geocoding
+@app.route("/api/get/coords")
+def getPlaceCoords():
+    # request parameters contain term and location of requested place
+    address = request.args.get('address')
+    http = httplib2.Http()
+    # headers of the request contain Yelp API key
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + \
+        address + '&key=AIzaSyCMbDSxqs3jlItqgrMyvLT5LlAeDM4BxUc'
+    # replacing spaces with url encoding
+    url = url.replace(' ', '%20')
+    _, content = http.request(url, 'GET')
+
+    # return json object with data
+    r = Response(response=content, status=200, mimetype="application/json")
+    r.headers["Content-Type"] = "application/json; charset=utf-8"
+    return r
+'''
+
 
 
 def generateCSRFToken():
