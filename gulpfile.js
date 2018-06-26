@@ -13,8 +13,13 @@ gulp.task('minify', function () {
     .pipe(useref())
     .pipe(gulpif('*.js', uglify()))
     .pipe(gulpif('*.css', minifyCss()))
+    .pipe(gulp.dest('tmp'));
+})
+
+gulp.task('move', function () {
+    gulp.src('tmp/base-raw.html')
     .pipe(rename({
-        basename: 'base'
+        basename: "base"
     }))
     .pipe(gulp.dest('templates'));
 })
