@@ -41,7 +41,10 @@ APPLICATION_NAME = "wanderer"
 # render main page
 @app.route("/")
 def showMainPage():
-    return render_template('base.html')
+    user_authenticated = False
+    if 'username' in login_session:
+        user_authenticated = True
+    return render_template('base.html', user = user_authenticated)
 
 
 # get all categories for current user
@@ -64,18 +67,18 @@ def getPlaces():
     print "getting places"
     if 'username' in login_session:
         print "getting current user id:"
-        current_user_id = getUserId(login_session['email'])
-        print current_user_id
+        user_id = getUserId(login_session['email']);
+        print user_id
         current_category = request.args['category']
         
         if current_category == "All":
             print "category: All"
-            user_places = session.query(Place).filter_by(user_id=current_user_id).all()
+            user_places = session.query(Place).filter_by(user_id=user_id).all()
             print len(user_places)
         else:
             print current_category
-            current_category_id = getCategoryId(current_category, current_user_id)
-            user_places = session.query(Place).filter_by(user_id=current_user_id).filter_by(category_id=current_category_id).all()
+            current_category_id = getCategoryId(current_category, user_id)
+            user_places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=current_category_id).all()
 
         print "returning result"
         return jsonify(Places=[i.serialize for i in user_places])
@@ -355,11 +358,10 @@ def getCategoryId(user_name, user_id):
 # get user id 
 def getUserId(user_email):
     print "getUserId:"
-    print login_session['email']
+    print user_email
     try:
         print "trying to obtain user data from db"
-        user = session.query(AppUser).filter_by(email=login_session['email']).one()
-        print user.name
+        user = session.query(AppUser).filter_by(email=user_email).one()
         print user.id
         return user.id
     except:
