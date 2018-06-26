@@ -69,7 +69,7 @@ def getPlaces():
         current_category = request.args['category']
         
         if current_category == "All":
-            print "category equals All"
+            print "category: All"
             user_places = session.query(Place).filter_by(user_id=current_user_id).all()
             print len(user_places)
         else:
@@ -249,7 +249,7 @@ def gdisconnect():
                                  401)
         response.headers['Content-Type'] = 'application/json'
         status = "Current user not connected."
-        return render_template('places.html',
+        return render_template('base.html',
                                user_status=status)
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
         % login_session['access_token']
@@ -269,7 +269,7 @@ def gdisconnect():
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         status = "Successfully disconnected."
-        return render_template('places.html',
+        return render_template('base.html',
                                user_status=status)
     else:
         # temporary fix, error 400
@@ -285,7 +285,7 @@ def gdisconnect():
         )
         response.headers['Content-Type'] = 'application/json'
         status = "Failed to revoke token for given user."
-        return render_template('places.html',
+        return render_template('base.html',
                                user_status=status)
 
 
