@@ -48,7 +48,6 @@ class Place(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     description = Column(String(500), nullable=False)
-    category = Column(String(250), nullable=False)
     lat = Column(String(25), nullable=False)
     lng = Column(String(25), nullable=False)
     yelpData = Column(String(25), nullable=True)
@@ -63,9 +62,9 @@ class Place(Base):
         return {
             'name': self.name,
             'description': self.description,
-            'category': self.category,
             'coords': { 'lat': float(self.lat), 'lng': float(self.lng) },
             'yelpData': self.yelpData,
+            'category_id': self.category_id,
             'id': self.id,
         }
 

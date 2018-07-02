@@ -1,7 +1,10 @@
 var map;
 var infowindow;
 
+var mapPlaces = {};
 var mapMarkers = [];
+
+var currentMarker;
 
 // create Map, InfoWindow object add markers to the map
 function initializeMap() {
@@ -23,6 +26,101 @@ function initializeMap() {
   centerControlDiv.index = 1;
   map.controls[google.maps.ControlPosition.RIGHT_TOP].push(centerControlDiv);
 
+  setTimeout(function () {
+    mapPlaces = _viewModel.places();
+    for (i = 0; i < mapPlaces.length; i++) {
+      addMarker(mapPlaces[i]);
+    }
+  }, 1000);
+
+}
+
+function addMarker(place) {
+
+  var content = '<b>' + place.name + '</b><br/>' + place.description;
+
+  var marker = new google.maps.Marker({
+    position: place.coords,
+    map: map,
+    name: place.name,
+    description: place.description,
+    category_description: '',
+    category: place.category_id,
+    animation: google.maps.Animation.DROP,
+    icon: "/static/icons/blue-icon.png",
+    location: place.coords.lat + "," + place.coords.lng
+  });
+
+  loadCategoryInfo(marker.category, function (data) {
+    if (data) {
+      marker.setOptions({ category_description: data.description });
+    }
+  });
+
+  // add markers to the map
+  mapMarkers.push(marker);
+
+  // add click listener
+  google.maps.event.addListener(marker, 'click', (function (marker, content) {
+    return function () {
+      // change current marker icon color to red
+      if (currentMarker) {
+        currentMarker.setIcon("/static/icons/blue-icon.png");
+      }
+      // set marker color to green
+      marker.setIcon("/static/icons/green-icon.png");
+
+      // remember current marker
+      currentMarker = marker;
+
+      // set infowindow content and open infowindow
+      infowindow.setContent(content);
+      infowindow.open(map, marker);
+
+      var initialContent = infowindow.getContent();
+
+      if (initialContent != infowindow.getContent()) {
+        return;
+      }
+      if (marker.category_description != '') {
+        var description = '';
+        description = '<div><b>Category:</b> ' +
+                       marker.category_description + '</div>';
+        infowindow.setContent(initialContent + description);
+      }
+    }
+  })(marker, content));
+
+  // change icon color if user closes infowindow
+  google.maps.event.addListener(infowindow, 'closeclick', (function () {
+    return function () {
+      currentMarker.setIcon('/static/icons/blue-icon.png');
+    }
+  })());
+
+  // if marker is not visible, close infowindow and change icon color
+  google.maps.event.addListener(marker, 'visible_changed', (function (marker) {
+    return function () {
+      infowindow.close();
+      if (currentMarker) {
+        currentMarker.setIcon('/static/icons/blue-icon.png');
+      }
+    }
+  })(marker));
+}
+
+// filter markers on the map
+filterMarkers = function (category) {
+  var text = category;
+  console.log(text);
+  if (typeof google === 'object' && typeof google.maps === 'object') {
+    for (i = 0; i < mapMarkers.length; i++) {
+      marker = mapMarkers[i];
+      console.log(marker.category_description);
+      var match = marker.category_description.indexOf(text) != -1 || text == "All";
+      marker.setVisible(match);
+    }
+  }
 }
 
 /**
@@ -60,7 +158,7 @@ function CenterControl(controlDiv, map) {
   // Setup the click event listeners: simply set the map to Chicago.
   controlUI.addEventListener('click', function () {
     if (document.getElementById('logoutElem')) {
-      map.setOptions({draggableCursor: 'copy'});
+      map.setOptions({ draggableCursor: 'copy' });
       google.maps.event.addListenerOnce(map, "click", function (event) {
         history.pushState(null, null, "/places/new");
         google.maps.event.addListenerOnce(infowindow, 'closeclick', (function () {
@@ -68,7 +166,7 @@ function CenterControl(controlDiv, map) {
             history.pushState(null, null, "/");
           }
         })());
-        map.setOptions({draggableCursor: 'auto'});
+        map.setOptions({ draggableCursor: 'auto' });
         var latitude = event.latLng.lat();
         var longitude = event.latLng.lng();
         var latLng = event.latLng;
@@ -82,13 +180,13 @@ function CenterControl(controlDiv, map) {
         infowindow.open(map);
         document.getElementById("newPlaceLat").value = latitude;
         document.getElementById("newPlaceLng").value = longitude;
-  
+
       });
     } else {
       var loginButton = document.getElementById('loginElem');
       loginButton.click();
     }
-    
+
   });
 }
 
