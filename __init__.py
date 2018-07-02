@@ -54,8 +54,22 @@ def getCategories():
     if 'username' in login_session:
         user_id = getUserId(login_session['email']);
         user_categories = session.query(Category).filter_by(user_id=user_id).all()
-        print "returning result"
+        print "returning categories"
         return jsonify(Categories=[i.serialize for i in user_categories])
+    else:
+        print "user not in session"
+        return Response('User is not authenticated', status=200)
+
+
+# get all categories for current user
+@app.route("/api/get/category", methods=['GET'])
+def getCategoryInfo():
+    print "getting category info"
+    if 'username' in login_session:
+        category_id = request.args['id']
+        category_info = session.query(Category).filter_by(id=category_id).one()
+        print "returning category info"
+        return jsonify(Category=category_info.serialize)
     else:
         print "user not in session"
         return Response('User is not authenticated', status=200)
@@ -64,41 +78,39 @@ def getCategories():
 # get places for current user
 @app.route("/api/places", methods=['GET'])
 def getPlaces():
-    print "getting places"
     if 'username' in login_session:
-        print "getting current user id:"
-        user_id = getUserId(login_session['email']);
-        print user_id
+        user_id = getUserId(login_session['email'])
         current_category = request.args['category']
+        print "getPlaces"
+        print "current_category input:"
+        print current_category
         
         if current_category == "All":
-            print "category: All"
+            print "show all places"
             user_places = session.query(Place).filter_by(user_id=user_id).all()
-            print len(user_places)
+            print "user_places:"
+            print user_places
         else:
-            print current_category
-            current_category_id = getCategoryId(current_category, user_id)
+            print "show category:"
+            current_category_id = getCategoryIdByDescription(user_id, current_category)
+            print current_category_id
             user_places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=current_category_id).all()
-
-        print "returning result"
+            print "user_places:"
+            print user_places
         return jsonify(Places=[i.serialize for i in user_places])
     else:
-        print "user not in session"
         return Response('User is not authenticated', status=200)
 
 
 # Create new place
 @app.route('/categories/new', methods=['POST'])
 def newCategory():
-    print "creating new category"
     # check user id, only admin can create points
     user_id = getUserId(login_session['email'])
     # add place to database on POST
     if request.method == 'POST':
-        print "method POST"
         categoryNameRaw = request.form['name']
         categoryName = categoryNameRaw.replace(' ', '').lower()
-        print categoryName
         createdCategory = Category(name=categoryName,
                        description=request.form['name'],
                        user_id=user_id)
@@ -119,6 +131,7 @@ def newPlace():
     if request.method == 'POST':
         category = request.form['category']
         category_id = getCategoryId(user_id, category)
+        print "adding new point:"
         print request.form['name']
         print request.form['description']
         print request.form['lat']
@@ -126,18 +139,17 @@ def newPlace():
         print category_id
         print request.form['category']
         print user_id
-        '''
+
         newPlace = Place(name=request.form['name'],
                        description=request.form['description'],
                        lat=request.form['lat'],
                        lng=request.form['lng'],
-                       yelpData={},
+                       yelpData='',
                        category_id=category_id,
                        user_id=user_id)
         session.add(newPlace)
         session.commit()
         # redirect to main page
-        '''
         return redirect(url_for('showMainPage'))
     else:
         # show forms to create new place on GET
@@ -342,13 +354,20 @@ def checkUser(login_session):
     else:
         return user
 
-
-def getCategoryId(user_name, user_id):
-    print "getCategoryId"
-    print user_name
-    print user_id
+def getCategoryIdByDescription(user_id, description):
     try:
-        category = session.query(Category).filter_by(name=user_name).filter_by(user_id=user_id).one()
+        category = session.query(Category).filter_by(user_id=user_id).filter_by(description=description).one()
+        print category.id
+        return category.id
+    except:
+        return None
+
+def getCategoryId(user_id, category):
+    print "getCategoryId"
+    print user_id
+    print category
+    try:
+        category = session.query(Category).filter_by(user_id=user_id).filter_by(name=category).one()
         print category.id
         return category.id
     except:
@@ -356,13 +375,9 @@ def getCategoryId(user_name, user_id):
 
 
 # get user id 
-def getUserId(user_email):
-    print "getUserId:"
-    print user_email
+def getUserId(email):
     try:
-        print "trying to obtain user data from db"
-        user = session.query(AppUser).filter_by(email=user_email).one()
-        print user.id
+        user = session.query(AppUser).filter_by(email=email).one()
         return user.id
     except:
         return None
