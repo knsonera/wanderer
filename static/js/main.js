@@ -255,7 +255,7 @@ function AddControl(controlDiv, map) {
   controlText.innerHTML = 'Add New Point';
   controlUI.appendChild(controlText);
 
-  // Setup the click event listeners: simply set the map to Chicago.
+  // Setup the click event listeners.
   controlUI.addEventListener('click', function () {
     if (document.getElementById('logoutElem')) {
       map.setOptions({ draggableCursor: 'copy' });
@@ -321,9 +321,10 @@ function EditControl(controlDiv, map) {
   controlText.innerHTML = 'Remove Points';
   controlUI.appendChild(controlText);
 
-  // Setup the click event listeners: simply set the map to Chicago.
+  // Setup the click event listeners:.
   controlUI.addEventListener('click', function () {
     if (document.getElementById('logoutElem')) {
+      map.setOptions({ draggableCursor: 'not-allowed' });
       mapMarkers.forEach(function (marker) {
         google.maps.event.addListenerOnce(marker, 'click', function () {
           var infoDeletePlaceContentElem = document.getElementById('deletePlaceForm');
