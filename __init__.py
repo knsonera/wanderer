@@ -144,7 +144,7 @@ def newPlace():
                        description=request.form['description'],
                        lat=request.form['lat'],
                        lng=request.form['lng'],
-                       yelpData='',
+                       yelpData='false',
                        category_id=category_id,
                        user_id=user_id)
         session.add(newPlace)
@@ -154,6 +154,80 @@ def newPlace():
     else:
         # show forms to create new place on GET
         return redirect(url_for('showMainPage'))
+
+
+# delete place
+@app.route('/places/delete', methods=['POST'])
+def deletePlace():
+    # check user id, only admin can create points
+    user_id = getUserId(login_session['email'])
+
+    # remove place from database
+    if request.method == 'POST':
+        category_id = getCategoryIdByDescription(user_id, request.form['category'])
+        name = request.form['name']
+
+        place_to_delete = session.query(Place).filter_by(category_id=category_id).filter_by(name=name).one()
+
+        session.delete(place_to_delete)
+        session.commit()
+        return redirect(url_for('showMainPage'))
+
+
+# request data from Yelp API
+@app.route("/api/get/yelpdata")
+def getPlaceInfo():
+    # request parameters contain term and location of requested place
+    term = request.args.get('term')
+    location = request.args.get('location')
+
+    http = httplib2.Http()
+    # headers of the request contain Yelp API key
+    headers = {'Authorization': 'Bearer ' + YELP_API_KEY}
+    url = 'https://api.yelp.com/v3/businesses/search?term=' + \
+        term + '&location=' + location
+    # replacing spaces with url encoding
+    url = url.replace(' ', '%20')
+    _, content = http.request(url, 'GET', headers=headers)
+
+    # return json object with data
+    r = Response(response=content, status=200, mimetype="application/json")
+    r.headers["Content-Type"] = "application/json; charset=utf-8"
+    return r
+
+
+@app.route('/places/save/yelpdata', methods=['POST'])
+def saveYelpData():
+    user_id = getUserId(login_session['email'])
+
+    if request.method == 'POST':
+        req_data = request.get_json()
+
+        name = req_data['name']
+        category = req_data['category']
+
+        image = req_data['image']
+        rating = req_data['rating']
+        reviews = req_data['reviews']
+        price = req_data['price']
+        url = req_data['url']
+
+        category_id = getCategoryIdByDescription(user_id, category)
+
+        edited_place = session.query(Place).filter_by(category_id=category_id).filter_by(name=name).one()
+
+        edited_place.yelp_image_url = req_data['image']
+        edited_place.yelp_rating = req_data['rating']
+        edited_place.yelp_reviews = req_data['reviews']
+        edited_place.yelp_price = req_data['price']
+        edited_place.yelp_url = req_data['url']
+        edited_place.yelpData = "true"
+
+        session.add(edited_place)
+        session.commit()
+
+    return json.dumps(request.data)
+
 
 # Google OAuth
 @app.route('/gconnect', methods=['POST'])
@@ -357,7 +431,6 @@ def checkUser(login_session):
 def getCategoryIdByDescription(user_id, description):
     try:
         category = session.query(Category).filter_by(user_id=user_id).filter_by(description=description).one()
-        print category.id
         return category.id
     except:
         return None

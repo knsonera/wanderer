@@ -173,6 +173,25 @@
             </div>
         </div>
 
+        <div class="delete-place-hidden" id="deletePlaceForm">
+            <div class="delete-place">
+                <h5 class="delete-place-title">
+                    <span>Are you sure you want to delete this place?</span>
+                </h5>
+                <form action="/places/delete" method="post">
+                    <div class="form-group delete-place-form-hidden">
+                        <input type="text" name="name" class="form-control" id="deletePlaceName" placeholder="Name" maxlength=80 required>
+                    </div>
+                    <div class="form-group delete-place-form-hidden">
+                        <input type="text" name="category" class="form-control" id="deletePlaceCategory" placeholder="Category" maxlength=80 required>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary delete-place-submit">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Bootstrap core JavaScript
     ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->

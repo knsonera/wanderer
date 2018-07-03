@@ -18,13 +18,19 @@ function initializeMap() {
     content: '',
     maxWidth: 250
   });
-  // Create the DIV to hold the control and call the CenterControl()
+  // Create the DIV to hold the control and call the addControl()
   // constructor passing in this DIV.
-  var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map);
+  var addControlDiv = document.createElement('div');
+  var editControlDiv = document.createElement('div');
 
-  centerControlDiv.index = 1;
-  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(centerControlDiv);
+  var addControl = new AddControl(addControlDiv, map);
+  var editControl = new EditControl(editControlDiv, map);
+
+  addControlDiv.index = 1;
+  editControlDiv.index = 1;
+
+  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(addControlDiv);
+  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(editControlDiv);
 
   setTimeout(function () {
     mapPlaces = _viewModel.places();
@@ -46,6 +52,10 @@ function addMarker(place) {
     description: place.description,
     category_description: '',
     category: place.category_id,
+    yelpImage: place.yelpImage,
+    yelpRating: place.yelpRating,
+    yelpPrice: place.yelpPrice,
+    yelpUrl: place.yelpUrl,
     animation: google.maps.Animation.DROP,
     icon: "/static/icons/blue-icon.png",
     location: place.coords.lat + "," + place.coords.lng
@@ -85,8 +95,99 @@ function addMarker(place) {
       if (marker.category_description != '') {
         var description = '';
         description = '<div><b>Category:</b> ' +
-                       marker.category_description + '</div>';
+          marker.category_description + '</div>';
         infowindow.setContent(initialContent + description);
+      }
+
+      var databaseContent = infowindow.getContent();
+
+      var yelpData = {
+        imageUrl: marker.yelpImage,
+        price: marker.yelpPrice,
+        rating: marker.yelpRating,
+        reviewCount: marker.yelpReviews,
+        yelpUrl: marker.yelpUrl
+      }
+
+      if (yelpData.imageUrl) {
+          console.log('data available in db')
+          yelpData.available = true;
+          showYelpData(yelpData);
+      } else {
+        console.log('no data, loading from yelp')
+        loadYelpData(
+          marker.name,
+          marker.location,
+          function (data) {
+            saveYelpData(marker.name, marker.category_description,
+              data.imageUrl, data.rating, data.reviewCount,
+              data.price, data.yelpUrl);
+            marker.yelpImage = data.imageUrl;
+            marker.yelpPrice = data.price;
+            marker.yelpRating = data.rating;
+            marker.yelpUrl = data.yelpUrl;
+            marker.reviewCount = data.reviewCount;
+            showYelpData(data);
+          })
+      }
+
+      function showYelpData(data) {
+        // avoid multiple objects in infowindow
+        if (databaseContent != infowindow.getContent()) {
+          return;
+        }
+        // change infowindow content based on data from yelp
+        if (data) {
+          // data received
+          if (data.available) {
+            // place found on yelp
+            var image = '';
+            var rating = '';
+            var price = '';
+            var yelp = '';
+            if (data.imageUrl) {
+              image = '<br><img height="100" width="100" src="'
+                + data.imageUrl + '">';
+            }
+            if (data.rating) {
+              rating = '<br><div><b>Rating:</b> ' +
+                data.rating +
+                ' (based on ' +
+                data.reviewCount +
+                ' reviews)</div>';
+            }
+            if (data.price) {
+              price = '<div><b>Price:</b> ' +
+                data.price + '</div>';
+            }
+            if (data.yelpUrl) {
+              yelp = '<div><a href="' + data.yelpUrl +
+                '">Provided by Yelp.com</a></div>';
+            }
+            // add yelp data to infowindow
+            infowindow.setContent(databaseContent + image +
+              rating + price + yelp);
+          } else {
+            // place not found on yelp
+            var notfound = '<br><br><div>(Sorry, this place is \
+                            not found on Yelp.\
+                            Rating, photos and prices are not \
+                            available.)\
+                            <a href="http://www.yelp.com" \
+                            target="blank">www.yelp.com</a>\
+                            </div>';
+            infowindow.setContent(databaseContent + notfound);
+          }
+        } else {
+          // data from yelp is not available
+          var nodata = '<br><br><div>\
+                        (Sorry, Yelp is not responding. \
+                        Rating, photos and prices are not \
+                        available at this time.)\
+                        <a href="http://www.yelp.com" \
+                        target="blank">www.yelp.com</a></div>';
+          infowindow.setContent(databaseContent + nodata);
+        }
       }
     }
   })(marker, content));
@@ -124,12 +225,11 @@ filterMarkers = function (category) {
 }
 
 /**
-     * The CenterControl adds a control to the map that recenters the map on
-     * Chicago.
+     * The AddControl adds a control to the map.
      * This constructor takes the control DIV as an argument.
      * @constructor
      */
-function CenterControl(controlDiv, map) {
+function AddControl(controlDiv, map) {
 
   // Set CSS for the control border.
   var controlUI = document.createElement('div');
@@ -187,6 +287,61 @@ function CenterControl(controlDiv, map) {
       loginButton.click();
     }
 
+  });
+}
+
+/**
+     * The EditControl adds a control to the map.
+     * This constructor takes the control DIV as an argument.
+     * @constructor
+     */
+function EditControl(controlDiv, map) {
+
+  // Set CSS for the control border.
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = '#fff';
+  controlUI.style.border = '2px solid #fff';
+  controlUI.style.borderRadius = '3px';
+  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.marginTop = '10px';
+  controlUI.style.marginRight = '13px';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Edit points on map (for authenticated users)';
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior.
+  var controlText = document.createElement('div');
+  controlText.style.color = 'rgb(25,25,25)';
+  controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+  controlText.style.fontSize = '14px';
+  controlText.style.lineHeight = '25px';
+  controlText.style.paddingLeft = '5px';
+  controlText.style.paddingRight = '5px';
+  controlText.innerHTML = 'Remove Points';
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlUI.addEventListener('click', function () {
+    if (document.getElementById('logoutElem')) {
+      mapMarkers.forEach(function (marker) {
+        google.maps.event.addListenerOnce(marker, 'click', function () {
+          var infoDeletePlaceContentElem = document.getElementById('deletePlaceForm');
+          infoDeletePlaceContentHTML = infoDeletePlaceContentElem.innerHTML;
+          infoDeletePlaceContentHTML.className = 'delete-place-visible';
+          infoDeletePlaceContent = infoDeletePlaceContentHTML;
+          console.log(infoDeletePlaceContent);
+          infowindow.setContent(infoDeletePlaceContent);
+          infowindow.open(map, marker);
+
+          document.getElementById("deletePlaceName").value = marker.name;
+          document.getElementById("deletePlaceCategory").value = marker.category_description;
+        })
+      })
+    } else {
+      var loginButton = document.getElementById('loginElem');
+      loginButton.click();
+    }
   });
 }
 

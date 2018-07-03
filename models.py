@@ -51,6 +51,11 @@ class Place(Base):
     lat = Column(String(25), nullable=False)
     lng = Column(String(25), nullable=False)
     yelpData = Column(String(25), nullable=True)
+    yelp_image_url = Column(String(500), nullable=True)
+    yelp_rating = Column(String(25), nullable=True)
+    yelp_price = Column(String(25), nullable=True)
+    yelp_url = Column(String(250), nullable=True)
+    yelp_reviews = Column(String(25), nullable=True)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('appuser.id'))
@@ -64,6 +69,11 @@ class Place(Base):
             'description': self.description,
             'coords': { 'lat': float(self.lat), 'lng': float(self.lng) },
             'yelpData': self.yelpData,
+            'yelpImage': self.yelp_image_url,
+            'yelpRating': self.yelp_rating,
+            'yelpReviews': self.yelp_reviews,
+            'yelpPrice': self.yelp_price,
+            'yelpUrl': self.yelp_url,
             'category_id': self.category_id,
             'id': self.id,
         }

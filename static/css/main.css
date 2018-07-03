@@ -142,6 +142,7 @@ h1, h2, h3, h4, h5, h6 {
 .new-place-title {
   text-align: center;
   color: rgb(40, 47, 51);
+  font-size: 16px;
 }
 
 .new-place-desc {
@@ -155,6 +156,32 @@ h1, h2, h3, h4, h5, h6 {
 
 .new-place-visible {
   display: block;
+}
+
+.delete-place {
+  padding: 0px;
+}
+
+.delete-place-title {
+  text-align: center;
+  color: rgb(40, 47, 51);
+  font-size: 16px;
+}
+
+.delete-place-hidden {
+  display: none;
+}
+
+.delete-place-form-hidden {
+  display: none;
+}
+
+.delete-place-visible {
+  display: block;
+}
+
+.delete-place-submit {
+  margin-left: 100px;
 }
 
 #categoriesTitle {
