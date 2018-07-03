@@ -410,8 +410,23 @@ def createUser(login_session):
     print "returning user..."
     user = session.query(AppUser).filter_by(email=login_session['email']).one()
     print user.id
+    user_id = user.id
+    addDefaultCategory(user_id, "all", "All")
+    addDefaultCategory(user_id, "coffee", "Coffee Shops")
+    addDefaultCategory(user_id, "dining", "Dining")
+    addDefaultCategory(user_id, "bars", "Bars & Clubs")
+    addDefaultCategory(user_id, "tourist", "Touristy Spots")
+    addDefaultCategory(user_id, "outdoors", "Outdoors")
+    addDefaultCategory(user_id, "local", "Local Gems")
+    addDefaultCategory(user_id, "thisthat", "This And That")
     return user.id
 
+def addDefaultCategory(user_id, name, description):
+    defaultCategory = Category(name=name,
+                      description=description,
+                      user_id=user_id)
+    session.add(defaultCategory)
+    session.commit()
 
 # get user from db
 def getUserInfo(user_id):
