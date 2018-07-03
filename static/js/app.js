@@ -9,6 +9,28 @@ var ViewModel = function () {
     self.currentPlace = ko.observable();
     // (end) define model (end)
 
+    /*self.fetchSelectedPlaceData = function (place) {
+        if (place.yelpData) {
+            // cached
+            self.currentPlace(place);
+        } else {
+            loadYelpData(
+                place.name,
+                place.coords.lat + ',' + place.coords.lng,
+                function (data) {
+                    place.yelpData = {
+                        imageUrl: data.imageUrl,
+                        rating: data.rating,
+                        reviewCount: data.reviewCount,
+                        price: data.price,
+                        yelpUrl: data.yelpUrl
+                    };
+                    self.currentPlace(place);
+                }
+            );
+        }
+    }*/
+
     loadUserCategories(function (loadedCategories) {
         console.log("loading categories");
         console.log(loadedCategories);
