@@ -34,7 +34,7 @@ YELP_API_KEY = 'iZC1vkpIktmdJW4bNLjTuwbuWsdGDDm6C24vQ0oHe20XtH2V3ag_vs85iGroCNff
 
 # Load client_id for google oauth
 CLIENT_ID = json.loads(
-    open('/var/www/wnd2r/wnd2r/static/js/client_secrets.json', 'r').read())['web']['client_id']
+    open('/vagrant/wanderer/static/js/client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "wanderer"
 
 
@@ -245,7 +245,7 @@ def gconnect():
     try:
         print "trying to upgrade auth code"
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('/var/www/wnd2r/wnd2r/static/js/client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/vagrant/wanderer/static/js/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         print code
         credentials = oauth_flow.step2_exchange(code)
@@ -316,6 +316,14 @@ def gconnect():
         if not user_id:
             print "creating new user in db"
             user_id = createUser(login_session)
+            addDefaultCategory(user_id, "all", "All")
+            addDefaultCategory(user_id, "coffee", "Coffee Shops")
+            addDefaultCategory(user_id, "dining", "Dining")
+            addDefaultCategory(user_id, "bars", "Bars & Clubs")
+            addDefaultCategory(user_id, "tourist", "Touristy Spots")
+            addDefaultCategory(user_id, "outdoors", "Outdoors")
+            addDefaultCategory(user_id, "local", "Local Gems")
+            addDefaultCategory(user_id, "thisthat", "This And That")
         login_session['user_id'] = user_id
 
     # Store the access token in the session.
@@ -411,22 +419,20 @@ def createUser(login_session):
     user = session.query(AppUser).filter_by(email=login_session['email']).one()
     print user.id
     user_id = user.id
-    addDefaultCategory(user_id, "all", "All")
-    addDefaultCategory(user_id, "coffee", "Coffee Shops")
-    addDefaultCategory(user_id, "dining", "Dining")
-    addDefaultCategory(user_id, "bars", "Bars & Clubs")
-    addDefaultCategory(user_id, "tourist", "Touristy Spots")
-    addDefaultCategory(user_id, "outdoors", "Outdoors")
-    addDefaultCategory(user_id, "local", "Local Gems")
-    addDefaultCategory(user_id, "thisthat", "This And That")
     return user.id
 
 def addDefaultCategory(user_id, name, description):
+    print "adding category"
+    print user_id
+    print name
+    print description
     defaultCategory = Category(name=name,
                       description=description,
                       user_id=user_id)
     session.add(defaultCategory)
     session.commit()
+    category = session.query(Category).filter_by(user_id=user_id).filter_by(name=name).one()
+    print category.id
 
 # get user from db
 def getUserInfo(user_id):
