@@ -57,6 +57,27 @@ var ViewModel = function () {
         self.currentPlace(place);
     };
 
+    self.deleteCategory = function (category) {
+        var data = {
+            'category': category.description
+        };
+        $.ajax({
+            url: '/categories/delete',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function () {
+                console.log('category successfully deleted');
+            },
+            error: function () {
+                console.log('something went wrong');
+            }})
+        setTimeout(function() {
+            window.location.href = "/";
+        }, 1000)
+    }
+
     self.placesJS = ko.toJS(self.places);
 }
 
