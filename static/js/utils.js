@@ -126,3 +126,21 @@ function saveYelpData(name, category, image, rating, reviews, price, url) {
             console.log('something went wrong');
         }})
 }
+
+function deleteCategory(category) {
+    var data = {
+        'category': category
+    };
+    $.ajax({
+        url: '/categories/delete',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        success: function () {
+            console.log('category successfully deleted');
+        },
+        error: function () {
+            console.log('something went wrong');
+        }})
+}

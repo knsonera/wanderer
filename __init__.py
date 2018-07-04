@@ -122,6 +122,26 @@ def newCategory():
         # show forms to create new place on GET
         return redirect(url_for('showMainPage'))
 
+
+# delete category
+@app.route('/categories/delete', methods=['POST'])
+def deleteCategory():
+    # check user id, only admin can create points
+    user_id = getUserId(login_session['email'])
+    reqData = request.get_json()
+    description = reqData['category']
+
+    # remove place from database
+    if request.method == 'POST':
+        category_to_delete = session.query(Category).filter_by(user_id=user_id).filter_by(description=description).one()
+
+        print "delete category:"
+        print category_to_delete.name
+        session.delete(category_to_delete)
+        session.commit()
+        return redirect(url_for('showMainPage'))
+
+
 # Create new place
 @app.route('/places/new', methods=['POST'])
 def newPlace():
