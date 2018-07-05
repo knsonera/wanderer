@@ -319,4 +319,10 @@ select.form-control:not([size]):not([multiple]) {
   .wrapper {
     height: 80vh;
   }
+  #signinTitle {
+    margin-left: auto;
+  }
+  #categoriesTitle {
+    margin-left: auto;
+  }
 }
