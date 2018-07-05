@@ -12,7 +12,12 @@ function initializeMap() {
     zoom: 12,
     center: { lat: 47.62, lng: -122.27 },
     styles: mapStyle,
-    fullscreenControl: false
+    fullscreenControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DEFAULT,
+      position: google.maps.ControlPosition.LEFT_BOTTOM
+    }
   });
   infowindow = new google.maps.InfoWindow({
     content: '',
@@ -249,10 +254,10 @@ function AddControl(controlDiv, map) {
   controlText.style.color = 'rgb(25,25,25)';
   controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
   controlText.style.fontSize = '14px';
-  controlText.style.lineHeight = '25px';
+  controlText.style.lineHeight = '35px';
   controlText.style.paddingLeft = '5px';
   controlText.style.paddingRight = '5px';
-  controlText.innerHTML = 'Add New Point';
+  controlText.innerHTML = '<img src="static/icons/plus.svg" alt="Add new point"></img>';
   controlUI.appendChild(controlText);
 
   // Setup the click event listeners.
@@ -315,10 +320,10 @@ function EditControl(controlDiv, map) {
   controlText.style.color = 'rgb(25,25,25)';
   controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
   controlText.style.fontSize = '14px';
-  controlText.style.lineHeight = '25px';
+  controlText.style.lineHeight = '35px';
   controlText.style.paddingLeft = '5px';
   controlText.style.paddingRight = '5px';
-  controlText.innerHTML = 'Remove Points';
+  controlText.innerHTML = '<img src="static/icons/trash-2.svg" alt="Remove points"></img>';
   controlUI.appendChild(controlText);
 
   // Setup the click event listeners:.
