@@ -35,6 +35,22 @@ function loadUserPlaces(category, loaded) {
         }})
 }
 
+function loadSharedPlaces(id, loaded) {
+    console.log('shared places: sending request');
+    $.ajax({
+        url: '/api/categories/'+ id +'/places',
+        success: function (json) {
+            console.log('shared places received');
+            if (json.hasOwnProperty('PlacesInCategory') && json.PlacesInCategory[0]) {
+                loaded(json.PlacesInCategory);
+            }
+        },
+        error: function () {
+            //alert('Place data is not available. Try again later');
+            loaded([]);
+        }})
+}
+
 function loadCategoryInfo(category_id, loaded) {
     console.log('category: sending request');
     var id = category_id;
@@ -121,24 +137,6 @@ function saveYelpData(name, category, image, rating, reviews, price, url) {
         dataType: 'json',
         success: function () {
             console.log('yelp data saved');
-        },
-        error: function () {
-            console.log('something went wrong');
-        }})
-}
-
-function deleteCategory(category) {
-    var data = {
-        'category': category
-    };
-    $.ajax({
-        url: '/categories/delete',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        dataType: 'json',
-        success: function () {
-            console.log('category successfully deleted');
         },
         error: function () {
             console.log('something went wrong');

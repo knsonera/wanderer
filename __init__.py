@@ -34,17 +34,18 @@ YELP_API_KEY = 'iZC1vkpIktmdJW4bNLjTuwbuWsdGDDm6C24vQ0oHe20XtH2V3ag_vs85iGroCNff
 
 # Load client_id for google oauth
 CLIENT_ID = json.loads(
-    open('/var/www/wnd2r/wnd2r/static/js/client_secrets.json', 'r').read())['web']['client_id']
+    open('/vagrant/wanderer/static/js/client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "wanderer"
 
 
 # render main page
 @app.route("/")
+@app.route("/places")
 def showMainPage():
     user_authenticated = False
     if 'username' in login_session:
         user_authenticated = True
-    return render_template('base.html', user = user_authenticated)
+    return render_template('base.html',user=user_authenticated)
 
 
 # get all categories for current user
@@ -265,7 +266,7 @@ def gconnect():
     try:
         print "trying to upgrade auth code"
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('/var/www/wnd2r/wnd2r/static/js/client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/vagrant/wanderer/static/js/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         print code
         credentials = oauth_flow.step2_exchange(code)
@@ -409,21 +410,21 @@ def gdisconnect():
 # API Endpoint: List of places (JSON)
 @app.route('/api/users/<int:user_id>/places')
 def placesJSON(user_id):
-    places = session.query(Place).filter_by(user_id=user_id).all();
+    places = session.query(Place).filter_by(user_id=user_id).all()
     return jsonify(Places=[i.serialize for i in places])
 
 
 # API Endpoint: List of categories (JSON)
 @app.route('/api/users/<int:user_id>/categories')
 def categoriesJSON(user_id):
-    categories = session.query(Category).filter_by(user_id=user_id).all();
+    categories = session.query(Category).filter_by(user_id=user_id).all()
     return jsonify(Categories=[i.serialize for i in categories])
 
 
 # API Endpoint: List of places in category (JSON)
-@app.route('/api/users/<int:user_id>/categories/<int:category_id>/places')
-def placesInCategoryJSON(user_id, category_id):
-    places = session.query(Place).filter_by(user_id=user_id).filter_by(category_id=category_id).all();
+@app.route('/api/categories/<int:category_id>/places')
+def placesInCategoryJSON(category_id):
+    places = session.query(Place).filter_by(category_id=category_id).all()
     return jsonify(PlacesInCategory=[i.serialize for i in places])
 
 

@@ -3,8 +3,21 @@ var ViewModel = function () {
 
     // define model
     var showAll = {description: "All", id: 0, name: "all", user_id: 0};
+    var showShared = {description: "Shared", id:0, name: "shared", user_id: 0};
     self.categories = ko.observableArray([]);
     self.places = ko.observableArray([]);
+
+    var current_path = window.location.search;
+    console.log(current_path);
+    if (current_path.includes("shared")) {
+        var shared_category_id = current_path.slice(8);
+        loadSharedPlaces(shared_category_id, function (loadedPlaces) {
+            console.log("loading shared places");
+            console.log(loadedPlaces);
+            self.selectedCategory(showShared);
+            self.places(loadedPlaces);
+        });
+    }
     self.selectedCategory = ko.observable(showAll);
     self.currentPlace = ko.observable();
     // (end) define model (end)
