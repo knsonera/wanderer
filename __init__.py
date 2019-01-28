@@ -230,6 +230,8 @@ def saveYelpData():
     if request.method == 'POST':
         req_data = request.get_json()
 
+        print req_data
+
         name = req_data['name']
         category = req_data['category']
 
