@@ -186,9 +186,15 @@ def deletePlace():
     # remove place from database
     if request.method == 'POST':
         category_id = getCategoryIdByDescription(user_id, request.form['category'])
+        print category_id
         name = request.form['name']
 
         place_to_delete = session.query(Place).filter_by(category_id=category_id).filter_by(name=name).one()
+
+        if user_id != place_to_delete.user_id:
+            return "<script>function myFunction() {\
+                    alert('You are not authorized to delete this place.');\
+                }</script><body onload='myFunction()'>"
 
         session.delete(place_to_delete)
         session.commit()
